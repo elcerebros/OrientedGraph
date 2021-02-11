@@ -2,66 +2,196 @@ package Graph;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeMap;
+
 import static org.junit.Assert.assertEquals;
 
 public class GraphTest {
     @Test
-    public void plus() {
-        assertEquals(new Rational(1, 2),
-                new Rational(1, 6).plus(new Rational(1, 3)));
+    public void getNeighbors() {
+        Graph graph = new Graph();
+        graph.addVertex("A");
+        graph.addVertex("B");
+        graph.addVertex("C");
+        graph.addVertex("D");
+        graph.connect("A", "B", 10);
+        graph.connect("A", "C", 1);
+        graph.connect("A", "D", 2);
+        graph.connect("B", "C", 7);
+        graph.connect("B", "D", 8);
+        graph.connect("C", "D", 6);
+
+        TreeMap<String, Integer> test1 = new TreeMap<>();
+        test1.put("B", 10);
+        test1.put("C", 1);
+        test1.put("D", 2);
+        assertEquals(test1, graph.getNeighbours("A"));
+
+        TreeMap<String, Integer> test2 = new TreeMap<>();
+        test2.put("C", 7);
+        test2.put("D", 8);
+        assertEquals(test2, graph.getNeighbours("B"));
+
+        TreeMap<String, Integer> test3 = new TreeMap<>();
+        assertEquals(test3, graph.getNeighbours("D"));
     }
 
     @Test
-    public void unaryMinus() {
-        assertEquals(new Rational(1, 2), new Rational(3, -6).unaryMinus());
+    public void renameVertex() {
+        Graph graph = new Graph();
+        graph.addVertex("A");
+        graph.addVertex("B");
+        graph.addVertex("C");
+        graph.addVertex("D");
+        graph.connect("A", "B", 10);
+        graph.connect("A", "C", 1);
+        graph.connect("A", "D", 2);
+        graph.connect("B", "C", 7);
+        graph.connect("B", "D", 8);
+        graph.connect("C", "D", 6);
+        graph.renameVertex("B", "B renamed");
+
+        TreeMap<String, Integer> test1 = new TreeMap<>();
+        test1.put("B renamed", 10);
+        test1.put("C", 1);
+        test1.put("D", 2);
+        assertEquals(test1, graph.getNeighbours("A"));
+
+        TreeMap<String, Integer> test2 = new TreeMap<>();
+        test2.put("C", 7);
+        test2.put("D", 8);
+        assertEquals(test2, graph.getNeighbours("B renamed"));
     }
 
     @Test
-    public void minus() {
-        assertEquals(new Rational(1, 3),
-                new Rational(1, 2).minus(new Rational(1, 6)));
+    public void removeVertex() {
+        Graph graph = new Graph();
+        graph.addVertex("A");
+        graph.addVertex("B");
+        graph.addVertex("C");
+        graph.addVertex("D");
+        graph.connect("A", "B", 10);
+        graph.connect("A", "C", 1);
+        graph.connect("A", "D", 2);
+        graph.connect("B", "C", 7);
+        graph.connect("B", "D", 8);
+        graph.connect("C", "D", 6);
+        graph.removeVertex("C");
+
+        TreeMap<String, Integer> test1 = new TreeMap<>();
+        test1.put("B", 10);
+        test1.put("D", 2);
+        assertEquals(test1, graph.getNeighbours("A"));
+
+        TreeMap<String, Integer> test2 = new TreeMap<>();
+        test2.put("D", 8);
+        assertEquals(test2, graph.getNeighbours("B"));
     }
 
     @Test
-    public void times() {
-        assertEquals(new Rational(3, 10),
-                new Rational(3, 4).times(new Rational(2, 5)));
+    public void removeConnection() {
+        Graph graph = new Graph();
+        graph.addVertex("A");
+        graph.addVertex("B");
+        graph.addVertex("C");
+        graph.addVertex("D");
+        graph.connect("A", "B", 10);
+        graph.connect("A", "C", 1);
+        graph.connect("A", "D", 2);
+        graph.connect("B", "C", 7);
+        graph.connect("B", "D", 8);
+        graph.connect("C", "D", 6);
+        graph.removeConnection("A", "B");
+
+        TreeMap<String, Integer> test1 = new TreeMap<>();
+        test1.put("C", 1);
+        test1.put("D", 2);
+        assertEquals(test1, graph.getNeighbours("A"));
+
+        TreeMap<String, Integer> test2 = new TreeMap<>();
+        test2.put("C", 7);
+        test2.put("D", 8);
+        assertEquals(test2, graph.getNeighbours("B"));
     }
 
     @Test
-    public void div() {
-        assertEquals(new Rational(2, 5),
-                new Rational(3, 10).div(new Rational(3, 4)));
+    public void changeValue() {
+        Graph graph = new Graph();
+        graph.addVertex("A");
+        graph.addVertex("B");
+        graph.addVertex("C");
+        graph.addVertex("D");
+        graph.connect("A", "B", 10);
+        graph.connect("A", "C", 1);
+        graph.connect("A", "D", 2);
+        graph.connect("B", "C", 7);
+        graph.connect("B", "D", 8);
+        graph.connect("C", "D", 6);
+        graph.changeValue("A", "C", 17);
+
+        TreeMap<String, Integer> test1 = new TreeMap<>();
+        test1.put("B", 10);
+        test1.put("C", 17);
+        test1.put("D", 2);
+        assertEquals(test1, graph.getNeighbours("A"));
     }
 
     @Test
-    public void toInt() {
-        assertEquals(1, new Rational(3, 2).toInt());
+    public void getNeighborsOut() {
+        Graph graph = new Graph();
+        graph.addVertex("A");
+        graph.addVertex("B");
+        graph.addVertex("C");
+        graph.addVertex("D");
+        graph.connect("A", "B", 10);
+        graph.connect("A", "C", 1);
+        graph.connect("A", "D", 2);
+        graph.connect("B", "C", 7);
+        graph.connect("B", "D", 8);
+        graph.connect("C", "D", 6);
+
+        ArrayList<String> test1 = new ArrayList<>();
+        test1.add("B");
+        test1.add("C");
+        test1.add("D");
+        assertEquals(test1, graph.getNeighborsOut("A"));
+
+        ArrayList<String> test2 = new ArrayList<>();
+        test2.add("C");
+        test2.add("D");
+        assertEquals(test2, graph.getNeighborsOut("B"));
+
+        ArrayList<String> test3 = new ArrayList<>();
+        assertEquals(test3, graph.getNeighborsOut("D"));
     }
 
     @Test
-    public void toDouble() {
-        assertEquals(0.5, new Rational(3, 6).toDouble(), 1e-10);
-    }
+    public void getNeighborsIn() {
+        Graph graph = new Graph();
+        graph.addVertex("A");
+        graph.addVertex("B");
+        graph.addVertex("C");
+        graph.addVertex("D");
+        graph.connect("A", "B", 10);
+        graph.connect("A", "C", 1);
+        graph.connect("A", "D", 2);
+        graph.connect("B", "C", 7);
+        graph.connect("B", "D", 8);
+        graph.connect("C", "D", 6);
 
-    @Test
-    public void equals() {
-        assertEquals(new Rational(1, 2), new Rational(2, 4));
-        assertEquals(new Rational(-1, 2), new Rational(2, -4));
-        assertEquals(new Rational(2, 3), new Rational(-4, -6));
-    }
+        ArrayList<String> test1 = new ArrayList<>();
+        assertEquals(test1, graph.getNeighborsIn("A"));
 
-    @Test(expected = ArithmeticException.class)
-    public void divZero() {
-        new Rational(1, 0);
-    }
+        ArrayList<String> test2 = new ArrayList<>();
+        test2.add("A");
+        assertEquals(test2, graph.getNeighborsIn("B"));
 
-    @Test
-    public void getters() {
-        Rational r = new Rational(3, 6);
-        assertEquals(1, r.getNumerator());
-        assertEquals(2, r.getDenominator());
+        ArrayList<String> test3 = new ArrayList<>();
+        test3.add("A");
+        test3.add("B");
+        test3.add("C");
+        assertEquals(test3, graph.getNeighborsIn("D"));
     }
-
 }
