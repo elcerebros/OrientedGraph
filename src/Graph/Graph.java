@@ -24,62 +24,69 @@ public final class Graph {
 
     private final TreeMap<String, Vertex> vertices = new TreeMap<>();
 
-    public void addVertex(String name) {
-        vertices.put(name, new Vertex(name, new TreeMap<>()));
-    }
+    private Vertex getVertex(String name) { return vertices.get(name); }
+
+    public void addVertex(String name) { vertices.put(name, new Vertex(name, new TreeMap<>())); }
 
     public void connect(String first, String second, int value) {
-        vertices.get(first).neighbours.put(vertices.get(second).name, value);
+        getVertex(first).neighbours.put(getVertex(second).name, value);
     }
 
     public void removeVertex(String name) {
-        try {
-            vertices.get(name);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         vertices.remove(name);
-        vertices.forEach((element, vertexElement) -> vertexElement.neighbours.remove(name));
+
+        vertices.forEach((element, vertex) -> vertex.neighbours.remove(name));
     }
 
     public void removeConnection(String first, String second) {
-        vertices.get(first).neighbours.remove(second);
+        getVertex(first).neighbours.remove(second);
     }
 
-    public void renameVertex(String lastName, String newName) {
+    public void changeName(String lastName, String newName) {
         Vertex current = vertices.get(lastName);
         vertices.remove(lastName);
         vertices.put(newName, current);
-        vertices.forEach((element, vertexElement) -> {
-            if (vertexElement.neighbours.containsKey(lastName)) {
-                Integer currentValue = vertexElement.neighbours.get(lastName);
-                vertexElement.neighbours.remove(lastName);
-                vertexElement.neighbours.put(newName, currentValue);
+
+        vertices.forEach((element, vertex) -> {
+            if (vertex.neighbours.containsKey(lastName)) {
+                int currentValue = vertex.neighbours.get(lastName);
+                vertex.neighbours.remove(lastName);
+                vertex.neighbours.put(newName, currentValue);
             }
         });
     }
 
     public void changeValue(String first, String second, int newValue) {
-        vertices.get(first).neighbours.put(second, newValue);
+        getVertex(first).neighbours.put(second, newValue);
     }
 
-    public List<String> getNeighborsOut(String name) {
+    public TreeMap<String, Integer> getNeighboursWithValue(String name) {
+        return getVertex(name).neighbours;
+    }
+
+    public List<String> getNeighboursOut(String name) {
+        try {
+            getVertex(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         List<String> listOfNeighbours = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : vertices.get(name).neighbours.entrySet()) {
+        for (Map.Entry<String, Integer> entry : getVertex(name).neighbours.entrySet()) {
             listOfNeighbours.add(entry.getKey());
         }
         return listOfNeighbours;
     }
 
-    public List<String> getNeighborsIn(String name) {
+    public List<String> getNeighboursIn(String name) {
+        try {
+            getVertex(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         List<String> listOfNeighbours = new ArrayList<>();
         for (Map.Entry<String, Vertex> entry : vertices.entrySet()) {
             if (entry.getValue().neighbours.containsKey(name)) listOfNeighbours.add(entry.getValue().name);
         }
         return listOfNeighbours;
-    }
-
-    public TreeMap<String, Integer> getNeighbours(String name) {
-        return vertices.get(name).neighbours;
     }
 }

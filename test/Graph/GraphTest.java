@@ -3,68 +3,11 @@ package Graph;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class GraphTest {
-    @Test
-    public void getNeighbors() {
-        Graph graph = new Graph();
-        graph.addVertex("A");
-        graph.addVertex("B");
-        graph.addVertex("C");
-        graph.addVertex("D");
-        graph.connect("A", "B", 10);
-        graph.connect("A", "C", 1);
-        graph.connect("A", "D", 2);
-        graph.connect("B", "C", 7);
-        graph.connect("B", "D", 8);
-        graph.connect("C", "D", 6);
-
-        TreeMap<String, Integer> test1 = new TreeMap<>();
-        test1.put("B", 10);
-        test1.put("C", 1);
-        test1.put("D", 2);
-        assertEquals(test1, graph.getNeighbours("A"));
-
-        TreeMap<String, Integer> test2 = new TreeMap<>();
-        test2.put("C", 7);
-        test2.put("D", 8);
-        assertEquals(test2, graph.getNeighbours("B"));
-
-        TreeMap<String, Integer> test3 = new TreeMap<>();
-        assertEquals(test3, graph.getNeighbours("D"));
-    }
-
-    @Test
-    public void renameVertex() {
-        Graph graph = new Graph();
-        graph.addVertex("A");
-        graph.addVertex("B");
-        graph.addVertex("C");
-        graph.addVertex("D");
-        graph.connect("A", "B", 10);
-        graph.connect("A", "C", 1);
-        graph.connect("A", "D", 2);
-        graph.connect("B", "C", 7);
-        graph.connect("B", "D", 8);
-        graph.connect("C", "D", 6);
-        graph.renameVertex("B", "B renamed");
-
-        TreeMap<String, Integer> test1 = new TreeMap<>();
-        test1.put("B renamed", 10);
-        test1.put("C", 1);
-        test1.put("D", 2);
-        assertEquals(test1, graph.getNeighbours("A"));
-
-        TreeMap<String, Integer> test2 = new TreeMap<>();
-        test2.put("C", 7);
-        test2.put("D", 8);
-        assertEquals(test2, graph.getNeighbours("B renamed"));
-    }
-
     @Test
     public void removeVertex() {
         Graph graph = new Graph();
@@ -80,14 +23,12 @@ public class GraphTest {
         graph.connect("C", "D", 6);
         graph.removeVertex("C");
 
-        TreeMap<String, Integer> test1 = new TreeMap<>();
-        test1.put("B", 10);
-        test1.put("D", 2);
-        assertEquals(test1, graph.getNeighbours("A"));
+        ArrayList<String> test1 = new ArrayList<>();
+        test1.add("B");
+        test1.add("D");
+        assertEquals(test1, graph.getNeighboursOut("A"));
 
-        TreeMap<String, Integer> test2 = new TreeMap<>();
-        test2.put("D", 8);
-        assertEquals(test2, graph.getNeighbours("B"));
+        assertThrows(Exception.class, () -> graph.getNeighboursOut("C"));
     }
 
     @Test
@@ -105,15 +46,42 @@ public class GraphTest {
         graph.connect("C", "D", 6);
         graph.removeConnection("A", "B");
 
-        TreeMap<String, Integer> test1 = new TreeMap<>();
-        test1.put("C", 1);
-        test1.put("D", 2);
-        assertEquals(test1, graph.getNeighbours("A"));
+        ArrayList<String> test1 = new ArrayList<>();
+        test1.add("C");
+        test1.add("D");
+        assertEquals(test1, graph.getNeighboursOut("A"));
 
-        TreeMap<String, Integer> test2 = new TreeMap<>();
-        test2.put("C", 7);
-        test2.put("D", 8);
-        assertEquals(test2, graph.getNeighbours("B"));
+        ArrayList<String> test2 = new ArrayList<>();
+        test2.add("C");
+        test2.add("D");
+        assertEquals(test2, graph.getNeighboursOut("B"));
+    }
+
+    @Test
+    public void changeName() {
+        Graph graph = new Graph();
+        graph.addVertex("A");
+        graph.addVertex("B");
+        graph.addVertex("C");
+        graph.addVertex("D");
+        graph.connect("A", "B", 10);
+        graph.connect("A", "C", 1);
+        graph.connect("A", "D", 2);
+        graph.connect("B", "C", 7);
+        graph.connect("B", "D", 8);
+        graph.connect("C", "D", 6);
+        graph.changeName("B", "B renamed");
+
+        ArrayList<String> test1 = new ArrayList<>();
+        test1.add("B renamed");
+        test1.add("C");
+        test1.add("D");
+        assertEquals(test1, graph.getNeighboursOut("A"));
+
+        ArrayList<String> test2 = new ArrayList<>();
+        test2.add("C");
+        test2.add("D");
+        assertEquals(test2, graph.getNeighboursOut("B renamed"));
     }
 
     @Test
@@ -135,7 +103,7 @@ public class GraphTest {
         test1.put("B", 10);
         test1.put("C", 17);
         test1.put("D", 2);
-        assertEquals(test1, graph.getNeighbours("A"));
+        assertEquals(test1, graph.getNeighboursWithValue("A"));
     }
 
     @Test
@@ -156,15 +124,17 @@ public class GraphTest {
         test1.add("B");
         test1.add("C");
         test1.add("D");
-        assertEquals(test1, graph.getNeighborsOut("A"));
+        assertEquals(test1, graph.getNeighboursOut("A"));
 
         ArrayList<String> test2 = new ArrayList<>();
         test2.add("C");
         test2.add("D");
-        assertEquals(test2, graph.getNeighborsOut("B"));
+        assertEquals(test2, graph.getNeighboursOut("B"));
 
         ArrayList<String> test3 = new ArrayList<>();
-        assertEquals(test3, graph.getNeighborsOut("D"));
+        assertEquals(test3, graph.getNeighboursOut("D"));
+
+        assertThrows(Exception.class, () -> graph.getNeighboursOut("F"));
     }
 
     @Test
@@ -182,16 +152,18 @@ public class GraphTest {
         graph.connect("C", "D", 6);
 
         ArrayList<String> test1 = new ArrayList<>();
-        assertEquals(test1, graph.getNeighborsIn("A"));
+        assertEquals(test1, graph.getNeighboursIn("A"));
 
         ArrayList<String> test2 = new ArrayList<>();
         test2.add("A");
-        assertEquals(test2, graph.getNeighborsIn("B"));
+        assertEquals(test2, graph.getNeighboursIn("B"));
 
         ArrayList<String> test3 = new ArrayList<>();
         test3.add("A");
         test3.add("B");
         test3.add("C");
-        assertEquals(test3, graph.getNeighborsIn("D"));
+        assertEquals(test3, graph.getNeighboursIn("D"));
+
+        assertThrows(Exception.class, () -> graph.getNeighboursOut("F"));
     }
 }
