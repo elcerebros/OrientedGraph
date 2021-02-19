@@ -3,9 +3,10 @@ package Graph;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class GraphTest {
     @Test
@@ -24,11 +25,11 @@ public class GraphTest {
         graph.removeVertex("C");
 
         ArrayList<String> test1 = new ArrayList<>();
-        test1.add("B");
-        test1.add("D");
-        assertEquals(test1, graph.getNeighboursOut("A"));
+        test1.add("A -> B");
+        test1.add("A -> D");
+        assertEquals(test1, graph.getArcsOut("A"));
 
-        assertThrows(Exception.class, () -> graph.getNeighboursOut("C"));
+        assertThrows(NullPointerException.class, () -> graph.getArcsOut("C"));
     }
 
     @Test
@@ -47,14 +48,14 @@ public class GraphTest {
         graph.removeConnection("A", "B");
 
         ArrayList<String> test1 = new ArrayList<>();
-        test1.add("C");
-        test1.add("D");
-        assertEquals(test1, graph.getNeighboursOut("A"));
+        test1.add("A -> C");
+        test1.add("A -> D");
+        assertEquals(test1, graph.getArcsOut("A"));
 
         ArrayList<String> test2 = new ArrayList<>();
-        test2.add("C");
-        test2.add("D");
-        assertEquals(test2, graph.getNeighboursOut("B"));
+        test2.add("B -> C");
+        test2.add("B -> D");
+        assertEquals(test2, graph.getArcsOut("B"));
     }
 
     @Test
@@ -73,15 +74,15 @@ public class GraphTest {
         graph.changeName("B", "B renamed");
 
         ArrayList<String> test1 = new ArrayList<>();
-        test1.add("B renamed");
-        test1.add("C");
-        test1.add("D");
-        assertEquals(test1, graph.getNeighboursOut("A"));
+        test1.add("A -> C");
+        test1.add("A -> D");
+        test1.add("A -> B renamed");
+        assertEquals(test1, graph.getArcsOut("A"));
 
         ArrayList<String> test2 = new ArrayList<>();
-        test2.add("C");
-        test2.add("D");
-        assertEquals(test2, graph.getNeighboursOut("B renamed"));
+        test2.add("B renamed -> C");
+        test2.add("B renamed -> D");
+        assertEquals(test2, graph.getArcsOut("B renamed"));
     }
 
     @Test
@@ -99,15 +100,15 @@ public class GraphTest {
         graph.connect("C", "D", 6);
         graph.changeValue("A", "C", 17);
 
-        TreeMap<String, Integer> test1 = new TreeMap<>();
-        test1.put("B", 10);
-        test1.put("C", 17);
-        test1.put("D", 2);
-        assertEquals(test1, graph.getNeighboursWithValue("A"));
+        HashMap<String, Integer> test1 = new HashMap<>();
+        test1.put("A -> B", 10);
+        test1.put("A -> C", 17);
+        test1.put("A -> D", 2);
+        assertEquals(test1, graph.getArcsWithValue("A"));
     }
 
     @Test
-    public void getNeighborsOut() {
+    public void getArcsOut() {
         Graph graph = new Graph();
         graph.addVertex("A");
         graph.addVertex("B");
@@ -121,24 +122,24 @@ public class GraphTest {
         graph.connect("C", "D", 6);
 
         ArrayList<String> test1 = new ArrayList<>();
-        test1.add("B");
-        test1.add("C");
-        test1.add("D");
-        assertEquals(test1, graph.getNeighboursOut("A"));
+        test1.add("A -> B");
+        test1.add("A -> C");
+        test1.add("A -> D");
+        assertEquals(test1, graph.getArcsOut("A"));
 
         ArrayList<String> test2 = new ArrayList<>();
-        test2.add("C");
-        test2.add("D");
-        assertEquals(test2, graph.getNeighboursOut("B"));
+        test2.add("B -> C");
+        test2.add("B -> D");
+        assertEquals(test2, graph.getArcsOut("B"));
 
         ArrayList<String> test3 = new ArrayList<>();
-        assertEquals(test3, graph.getNeighboursOut("D"));
+        assertEquals(test3, graph.getArcsOut("D"));
 
-        assertThrows(Exception.class, () -> graph.getNeighboursOut("F"));
+        assertThrows(NullPointerException.class, () -> graph.getArcsOut("F"));
     }
 
     @Test
-    public void getNeighborsIn() {
+    public void getArcsIn() {
         Graph graph = new Graph();
         graph.addVertex("A");
         graph.addVertex("B");
@@ -151,19 +152,60 @@ public class GraphTest {
         graph.connect("B", "D", 8);
         graph.connect("C", "D", 6);
 
-        ArrayList<String> test1 = new ArrayList<>();
-        assertEquals(test1, graph.getNeighboursIn("A"));
+        ArrayList<String> test3 = new ArrayList<>();
+        test3.add("A -> D");
+        test3.add("B -> D");
+        test3.add("C -> D");
+        assertEquals(test3, graph.getArcsIn("D"));
 
         ArrayList<String> test2 = new ArrayList<>();
-        test2.add("A");
-        assertEquals(test2, graph.getNeighboursIn("B"));
+        test2.add("A -> B");
+        assertEquals(test2, graph.getArcsIn("B"));
 
-        ArrayList<String> test3 = new ArrayList<>();
-        test3.add("A");
-        test3.add("B");
-        test3.add("C");
-        assertEquals(test3, graph.getNeighboursIn("D"));
+        ArrayList<String> test1 = new ArrayList<>();
+        assertEquals(test1, graph.getArcsIn("A"));
 
-        assertThrows(Exception.class, () -> graph.getNeighboursOut("F"));
+        assertThrows(NullPointerException.class, () -> graph.getArcsIn("F"));
+    }
+
+    @Test
+    public void Exceptions() {
+        Graph graph1 = new Graph();
+        graph1.addVertex("A");
+        graph1.addVertex("B");
+        graph1.addVertex("C");
+        graph1.connect("A", "D", 10);
+        assertThrows(NullPointerException.class, () -> graph1.getArcsOut("A"));
+
+        Graph graph2 = new Graph();
+        graph2.addVertex("A");
+        graph2.addVertex("B");
+        graph2.addVertex("A");
+        graph2.connect("A", "B", 10);
+        assertThrows(IllegalArgumentException.class, () -> graph2.getArcsOut("A"));
+
+        Graph graph3 = new Graph();
+        graph3.addVertex("A");
+        graph3.addVertex("B");
+        graph3.addVertex("C");
+        graph3.connect("A", "B", 10);
+        graph3.connect("A", "B", 10);
+        assertThrows(IllegalArgumentException.class, () -> graph3.getArcsOut("A"));
+
+        Graph graph4 = new Graph();
+        graph4.addVertex("A");
+        graph4.addVertex("B");
+        graph4.addVertex("C");
+        graph4.connect("A", "B", 10);
+        graph4.removeVertex("F");
+        assertThrows(NullPointerException.class, () -> graph4.getArcsOut("A"));
+
+        Graph graph5 = new Graph();
+        graph5.addVertex("A");
+        graph5.addVertex("B");
+        graph5.addVertex("C");
+        graph5.connect("A", "B", 10);
+        graph5.removeConnection("F", "A");
+        assertThrows(IllegalArgumentException.class, () -> graph5.getArcsOut("A"));
     }
 }
