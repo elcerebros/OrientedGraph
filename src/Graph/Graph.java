@@ -24,46 +24,23 @@ public final class Graph {
 
     private final Map<String, Vertex> vertices = new HashMap<>();
 
-    private final Map<String, Integer> errors = new HashMap<>() {{
-        put("Nonexistent vertex", 0);
-        put("Attempts to add existent vertex", 0);
-        put("Attempts to add existent connection", 0);
-        put("Edition of nonexistent vertex", 0);
-        put("Edition of nonexistent connection", 0);
-    }};
-
-    private void findErrors() throws IllegalArgumentException {
-        if (errors.get("Nonexistent vertex") > 0)
-            throw new NullPointerException("Nonexistent vertex");
-        if (errors.get("Attempts to add existent vertex") > 0)
-            throw new IllegalArgumentException("Attempts to add existent vertex");
-        if (errors.get("Attempts to add existent connection") > 0)
-            throw new IllegalArgumentException("Attempts to add existent connection");
-        if (errors.get("Edition of nonexistent vertex") > 0)
-            throw new NullPointerException("Edition of nonexistent vertex");
-        if (errors.get("Edition of nonexistent connection") > 0)
-            throw new IllegalArgumentException("Nonexistent connections");
-    }
-
     private Vertex getVertex(String name) { return vertices.get(name); }
 
     public void addVertex(String name) {
-        if (vertices.containsKey(name)) errors.replace("Attempts to add existent vertex", 1);
-
+        if (vertices.containsKey(name)) throw new IllegalArgumentException("Attempts to add existent vertex");
         else vertices.put(name, new Vertex(name, new HashMap<>()));
     }
 
     public void connect(String first, String second, int value) {
-        if (getVertex(first) == null || getVertex(second) == null) errors.replace("Nonexistent vertex", 1);
+        if (getVertex(first) == null || getVertex(second) == null)
+            throw new IllegalArgumentException("Nonexistent vertex");
         else if (getVertex(first).neighbours.containsKey(second))
-            errors.replace("Attempts to add existent connection", 1);
-
+            throw new IllegalArgumentException("Attempts to add existent connection");
         else getVertex(first).neighbours.put(getVertex(second).name, value);
     }
 
     public void removeVertex(String name) {
-        if (getVertex(name) == null) errors.replace("Edition of nonexistent vertex", 1);
-
+        if (getVertex(name) == null) throw new IllegalArgumentException("Edition of nonexistent vertex");
         else {
             vertices.remove(name);
             vertices.forEach((element, vertex) -> vertex.neighbours.remove(name));
@@ -72,14 +49,12 @@ public final class Graph {
 
     public void removeConnection(String first, String second) {
         if (getVertex(first) == null || getVertex(second) == null || !getVertex(first).neighbours.containsKey(second))
-            errors.replace("Edition of nonexistent connection", 1);
-
+            throw new IllegalArgumentException("Edition of nonexistent connection");
         else getVertex(first).neighbours.remove(second);
     }
 
     public void changeName(String lastName, String newName) {
-        if (getVertex(lastName) == null) errors.replace("Edition of nonexistent vertex", 1);
-
+        if (getVertex(lastName) == null) throw new IllegalArgumentException("Edition of nonexistent vertex");
         else {
             Vertex current = getVertex(lastName);
             vertices.remove(lastName);
@@ -96,38 +71,26 @@ public final class Graph {
 
     public void changeValue(String first, String second, int newValue) {
         if (getVertex(first) == null || getVertex(second) == null || !getVertex(first).neighbours.containsKey(second))
-            errors.replace("Edition of nonexistent connection", 1);
-
+            throw new IllegalArgumentException("Edition of nonexistent connection");
         else getVertex(first).neighbours.put(second, newValue);
     }
 
-    public List<String> getArcsOut(String name) {
-        if (getVertex(name) == null) errors.replace("Nonexistent vertex", 1);
-        findErrors();
+    public Map<String, Integer> getArcsOut(String name) {
+        if (getVertex(name) == null) throw new IllegalArgumentException("Nonexistent vertex");
 
-        List<String> currentList = new ArrayList<>(getVertex(name).neighbours.keySet());
-        List<String> result = new ArrayList<>();
-        currentList.forEach(element -> result.add(name + " -> " + element));
+        Map<String, Integer> currentList = new HashMap<>(getVertex(name).neighbours);
+        Map<String, Integer> result = new HashMap<>();
+        currentList.forEach(result::put);
         return result;
     }
 
-    public List<String> getArcsIn(String name) {
-        if (getVertex(name) == null) errors.replace("Nonexistent vertex", 1);
-        findErrors();
-
-        List<String> result = new ArrayList<>();
-        vertices.forEach((element, vertex) -> {
-            if (vertex.neighbours.containsKey(name)) result.add(vertex.name + " -> " + name);
-        });
-        return result;
-    }
-
-    public Map<String, Integer> getArcsWithValue(String name) {
-        if (getVertex(name) == null) errors.replace("Nonexistent vertex", 1);
-        findErrors();
+    public Map<String, Integer> getArcsIn(String name) {
+        if (getVertex(name) == null) throw new IllegalArgumentException("Nonexistent vertex");
 
         Map<String, Integer> result = new HashMap<>();
-        getVertex(name).neighbours.forEach((vertex, value) -> result.put(name + " -> " + vertex, value));
+        vertices.forEach((element, vertex) -> {
+            if (vertex.neighbours.containsKey(name)) result.put(vertex.name, vertex.neighbours.get(name));
+        });
         return result;
     }
 }
