@@ -57,6 +57,7 @@ public final class Graph {
         if (getVertex(lastName) == null) throw new IllegalArgumentException("Edition of nonexistent vertex");
         else {
             Vertex current = getVertex(lastName);
+            current.name = newName;
             vertices.remove(lastName);
             vertices.put(newName, current);
             vertices.forEach((element, vertex) -> {
@@ -78,10 +79,7 @@ public final class Graph {
     public Map<String, Integer> getArcsOut(String name) {
         if (getVertex(name) == null) throw new IllegalArgumentException("Nonexistent vertex");
 
-        Map<String, Integer> currentList = new HashMap<>(getVertex(name).neighbours);
-        Map<String, Integer> result = new HashMap<>();
-        currentList.forEach(result::put);
-        return result;
+        return new HashMap<>(getVertex(name).neighbours);
     }
 
     public Map<String, Integer> getArcsIn(String name) {
